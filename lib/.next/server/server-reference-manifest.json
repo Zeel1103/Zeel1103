@@ -1,0 +1,50 @@
+{
+  "node": {
+    "7f0c7fe8a77fb7306abba8b1d43241362915dd8791": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cjaguw%5C%5COneDrive%5C%5CDocuments%5C%5CNextjs%20React%5C%5Cai-medical-voice-agent%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Ckeyless-actions.js%22%2C%5B%7B%22id%22%3A%227f0c7fe8a77fb7306abba8b1d43241362915dd8791%22%2C%22exportedName%22%3A%22deleteKeylessAction%22%7D%2C%7B%22id%22%3A%227f1a6b30d657ee0f9193400b172c205c1e824e4780%22%2C%22exportedName%22%3A%22syncKeylessConfigAction%22%7D%2C%7B%22id%22%3A%227fb1d998762620a36765ea084f509f5e75d5521651%22%2C%22exportedName%22%3A%22createOrReadKeylessAction%22%7D%5D%5D%5D&__client_imported__=!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "rsc"
+      }
+    },
+    "7f1a6b30d657ee0f9193400b172c205c1e824e4780": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cjaguw%5C%5COneDrive%5C%5CDocuments%5C%5CNextjs%20React%5C%5Cai-medical-voice-agent%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Ckeyless-actions.js%22%2C%5B%7B%22id%22%3A%227f0c7fe8a77fb7306abba8b1d43241362915dd8791%22%2C%22exportedName%22%3A%22deleteKeylessAction%22%7D%2C%7B%22id%22%3A%227f1a6b30d657ee0f9193400b172c205c1e824e4780%22%2C%22exportedName%22%3A%22syncKeylessConfigAction%22%7D%2C%7B%22id%22%3A%227fb1d998762620a36765ea084f509f5e75d5521651%22%2C%22exportedName%22%3A%22createOrReadKeylessAction%22%7D%5D%5D%5D&__client_imported__=!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "rsc"
+      }
+    },
+    "7fb1d998762620a36765ea084f509f5e75d5521651": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cjaguw%5C%5COneDrive%5C%5CDocuments%5C%5CNextjs%20React%5C%5Cai-medical-voice-agent%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Ckeyless-actions.js%22%2C%5B%7B%22id%22%3A%227f0c7fe8a77fb7306abba8b1d43241362915dd8791%22%2C%22exportedName%22%3A%22deleteKeylessAction%22%7D%2C%7B%22id%22%3A%227f1a6b30d657ee0f9193400b172c205c1e824e4780%22%2C%22exportedName%22%3A%22syncKeylessConfigAction%22%7D%2C%7B%22id%22%3A%227fb1d998762620a36765ea084f509f5e75d5521651%22%2C%22exportedName%22%3A%22createOrReadKeylessAction%22%7D%5D%5D%5D&__client_imported__=!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "rsc"
+      }
+    },
+    "7fcfcc45fc65a9e9dfed68edb7aeee4cc45ff5321f": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cjaguw%5C%5COneDrive%5C%5CDocuments%5C%5CNextjs%20React%5C%5Cai-medical-voice-agent%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions.js%22%2C%5B%7B%22id%22%3A%227fcfcc45fc65a9e9dfed68edb7aeee4cc45ff5321f%22%2C%22exportedName%22%3A%22invalidateCacheAction%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "6CX99zxPS80Hau1Qo7TsMLJwORAHY6rpXJmfvtg1fZw="
+}

@@ -1,0 +1,114 @@
+import { db } from "@/config/db";
+import { appointmentsTable, doctorsTable } from "@/config/schema";
+import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import { NextResponse } from "next/server";
+import { eq, and } from "drizzle-orm";
+import { format } from "date-fns";
+import { Resend } from "resend";
+import PatientConfirmationEmail from "@/app/emails/PatientConfirmationEmail";
+import DoctorNotificationEmail from "@/app/emails/DoctorNotificationEmail";
+import { randomUUID } from "crypto"; // Natively available in Node.js
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(req: Request) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { doctorId, sessionId, slotTime: slotTimeString } = body;
+    const slotTime = new Date(slotTimeString);
+
+    // --- [Validation logic here] ---
+    if (!doctorId || !sessionId || isNaN(slotTime.getTime())) {
+      return NextResponse.json(
+        { error: "Missing or invalid doctorId, sessionId, or slotTime" },
+        { status: 400 }
+      );
+    }
+
+    const user = await clerkClient.users.getUser(userId);
+    const patientName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const patientEmail = user.emailAddresses?.[0]?.emailAddress;
+
+    if (!patientEmail) {
+      return NextResponse.json({ error: "Patient email not found" }, { status: 400 });
+    }
+
+    const [doctor] = await db.select().from(doctorsTable).where(eq(doctorsTable.id, doctorId));
+
+    if (!doctor || !doctor.email) {
+      return NextResponse.json({ error: "Doctor not found or missing email" }, { status: 404 });
+    }
+
+    // Check if the slot is already booked
+    const existingAppointment = await db.select().from(appointmentsTable).where(
+        and(
+            eq(appointmentsTable.doctorId, doctorId),
+            eq(appointmentsTable.slotTime, slotTime)
+        )
+    ).limit(1);
+
+    if (existingAppointment.length > 0) {
+        return NextResponse.json({ error: "This time slot is no longer available." }, { status: 409 });
+    }
+    
+    // ✅ 1. Generate a unique Jitsi Meet link
+    const meetId = randomUUID(); // Creates a long random string like "a1b2c3d4-..."
+    const meetLink = `https://meet.jit.si/${meetId}`;
+
+    // 2. Save appointment to DB with the new link
+    await db.insert(appointmentsTable).values({
+      userId,
+      doctorId,
+      sessionId: Number(sessionId),
+      date: slotTime,
+      slotTime,
+      patientName,
+      patientEmail,
+      status: "confirmed", // Status is now confirmed
+      videoLink: meetLink, // Save the Jitsi link
+    });
+
+    // 3. Send confirmation emails with the Jitsi link
+    const formattedDate = format(slotTime, "eeee, MMMM dd, yyyy 'at' hh:mm a");
+
+    // This block sends BOTH emails. It's already perfect.
+    await Promise.all([
+      resend.emails.send({
+        from: "Booking Confirmation <onboarding@resend.dev>", // You can customize this
+        to: patientEmail,
+        subject: "Your Appointment is Confirmed!",
+        react: PatientConfirmationEmail({
+          patientName,
+          doctorName: doctor.name,
+          appointmentDate: formattedDate,
+          meetLink: meetLink,
+        }),
+      }),
+      resend.emails.send({
+        from: "New Booking Alert <onboarding@resend.dev>", // You can customize this
+        to: doctor.email,
+        subject: `New Appointment with ${patientName}`,
+        react: DoctorNotificationEmail({
+          doctorName: doctor.name,
+          patientName,
+          appointmentDate: formattedDate,
+          meetLink: meetLink,
+        }),
+      }),
+    ]);
+
+    return NextResponse.json({ success: true, meetLink });
+  } catch (err: any) {
+    console.error("[BOOK_APPOINTMENT_ERROR]", err.message || err);
+    return NextResponse.json(
+      { error: err.message || "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

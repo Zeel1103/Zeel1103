@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1754389972925,
+      "tag": "0000_useful_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754648021572,
+      "tag": "0001_bent_dexter_bennett",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754650785148,
+      "tag": "0002_overconfident_killer_shrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1754734337907,
+      "tag": "0003_simple_callisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1754736992909,
+      "tag": "0004_concerned_killraven",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1754739545676,
+      "tag": "0005_yummy_guardsmen",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1754742285384,
+      "tag": "0006_fix-user-id-to-varchar",
+      "breakpoints": true
+    }
+  ]
+}
