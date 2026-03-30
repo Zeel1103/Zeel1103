@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import { Mic, Square, Loader2 } from 'lucide-react'
 
 type VoiceRecorderProps = {
   onTranscription: (text: string | null) => void
@@ -15,7 +16,6 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onTranscription }) => {
   const audioChunks = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
 
-  // 🎤 Request microphone permission
   const requestMicrophonePermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -24,186 +24,77 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onTranscription }) => {
       setMicError(null)
       return stream
     } catch (err: any) {
-      setMicError(null) // Clear previous error
-      
-      if (err.name === 'NotAllowedError') {
-        // User denied permission
-        setMicPermission('denied')
-        setMicError(
-          '❌ Microphone permission denied. Please enable it in your browser settings:\n\n' +
-          '1. Click the lock icon in the address bar\n' +
-          '2. Find "Microphone"\n' +
-          '3. Change to "Allow"\n' +
-          '4. Refresh the page and try again'
-        )
-        console.error('🔒 Microphone permission denied by user')
-      } else if (err.name === 'NotFoundError') {
-        // No microphone found
-        setMicError('❌ No microphone found on this device. Please connect a microphone and try again.')
-        console.error('🔌 No microphone device found')
-      } else if (err.name === 'NotReadableError') {
-        // Microphone in use
-        setMicError('❌ Microphone is in use by another application. Please close other apps using the microphone and try again.')
-        console.error('🔄 Microphone in use')
-      } else if (err.name === 'SecurityError') {
-        // HTTPS required or insecure context
-        setMicError('❌ Microphone access only works on HTTPS or localhost. Current URL is not secure.')
-        console.error('🔐 Security error - HTTPS required')
-      } else {
-        setMicError(`❌ Microphone error: ${err.message}`)
-        console.error('🎤 Microphone error:', err)
-      }
-      
+      setMicError(null)
+      if (err.name === 'NotAllowedError') { setMicPermission('denied'); setMicError('Mic permission denied. Enable it in browser settings.'); }
+      else if (err.name === 'NotFoundError') { setMicError('No microphone found. Connect one and try again.'); }
+      else if (err.name === 'NotReadableError') { setMicError('Microphone in use by another app.'); }
+      else { setMicError(`Mic error: ${err.message}`); }
       return null
     }
   }
 
   const startRecording = async () => {
     try {
-      // Stop previous stream if exists
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop())
-      }
-
-      // Request microphone permission
+      if (streamRef.current) { streamRef.current.getTracks().forEach(track => track.stop()); }
       const stream = await requestMicrophonePermission()
-      
-      if (!stream) {
-        // Permission denied or error
-        return
-      }
-
+      if (!stream) return
       const mediaRecorder = new MediaRecorder(stream)
       audioChunks.current = []
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) audioChunks.current.push(event.data)
-      }
-
+      mediaRecorder.ondataavailable = (event) => { if (event.data.size > 0) audioChunks.current.push(event.data); }
       mediaRecorder.onstop = async () => {
-        // Stop all audio tracks
         stream.getTracks().forEach(track => track.stop())
         streamRef.current = null
-
         const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' })
-        console.log("🎤 Audio blob size:", audioBlob.size)
-
-        if (audioBlob.size === 0) {
-          console.error("❌ Empty audio blob, skipping transcription")
-          setMicError('❌ No audio captured. Please try again.')
-          onTranscription(null)
-          setRecording(false)
-          setProcessing(false)
-          return
-        }
-
-        setProcessing(true)
-        setMicError(null)
-
+        if (audioBlob.size === 0) { setMicError('No audio captured.'); onTranscription(null); setRecording(false); setProcessing(false); return; }
+        setProcessing(true); setMicError(null)
         try {
           const formData = new FormData()
           formData.append('file', audioBlob, 'recording.webm')
-
-          const res = await fetch('/api/transcribe', {
-            method: 'POST',
-            body: formData,
-          })
-
-          if (!res.ok) {
-            console.error('❌ Transcription failed:', await res.text())
-            setMicError('❌ Transcription failed. Please try again.')
-            onTranscription(null)
-            return
-          }
-
+          const res = await fetch('/api/transcribe', { method: 'POST', body: formData })
+          if (!res.ok) { setMicError('Transcription failed.'); onTranscription(null); return; }
           const data = await res.json()
-          console.log('✅ Transcription result:', data)
           onTranscription(data.text || null)
-        } catch (err: any) {
-          console.error('Transcription error:', err)
-          setMicError(`❌ Transcription error: ${err.message}`)
-          onTranscription(null)
-        } finally {
-          setProcessing(false)
-        }
+        } catch (err: any) { setMicError(`Error: ${err.message}`); onTranscription(null); }
+        finally { setProcessing(false); }
       }
-
       mediaRecorderRef.current = mediaRecorder
       mediaRecorder.start()
       setRecording(true)
       setMicError(null)
-      console.log('🎙️ Recording started')
-    } catch (err: any) {
-      console.error('Recording error:', err)
-      setMicError(`❌ Recording error: ${err.message}`)
-      onTranscription(null)
-    }
+    } catch (err: any) { setMicError(`Recording error: ${err.message}`); onTranscription(null); }
   }
 
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop()
-    setRecording(false)
-    console.log('⏹️ Recording stopped')
-  }
+  const stopRecording = () => { mediaRecorderRef.current?.stop(); setRecording(false); }
 
   return (
-    <div className="w-full space-y-3">
-      {/* Error Message */}
+    <div className="w-full space-y-2">
       {micError && (
-        <div className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg text-sm whitespace-pre-wrap">
+        <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-medium">
           {micError}
         </div>
       )}
 
-      {/* Permission Status Indicator */}
-      {micPermission === 'granted' && !micError && (
-        <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-2 rounded-lg text-sm text-center">
-          ✅ Microphone permission granted - Ready to record
-        </div>
-      )}
-
-      {/* Connect Microphone Info */}
-      <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg text-xs text-gray-700">
-        <p className="font-semibold mb-1">💡 Microphone Info:</p>
-        <ul className="list-disc list-inside space-y-1 text-gray-600">
-          <li>Make sure your microphone is connected</li>
-          <li>Speak clearly and naturally after clicking "Start Speaking"</li>
-          <li>Click "Stop Recording" when you're done</li>
-          <li>Permission is requested when you first record</li>
-        </ul>
-      </div>
-
-      {/* Record Button */}
       <button
         onClick={recording ? stopRecording : startRecording}
         disabled={processing}
-        aria-busy={processing}
-        className={`w-full px-5 py-3 rounded-lg text-white font-semibold transition duration-200 flex items-center justify-center gap-2 ${
+        className={`w-full px-5 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm ${
           recording 
-            ? 'bg-red-600 hover:bg-red-700 shadow-lg' 
-            : 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 shadow-md'
-        } ${processing ? 'opacity-60 cursor-not-allowed' : 'active:shadow-inner'}`}
+            ? 'bg-red-50 border-2 border-red-200 text-red-600 hover:bg-red-100' 
+            : 'bg-emerald-50 border-2 border-emerald-100 text-emerald-700 hover:bg-emerald-100'
+        } ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
-        <span className="text-lg">
-          {processing
-            ? '⏳'
-            : recording
-            ? '⏹️'
-            : '🎙️'}
-        </span>
-        <span>
-          {processing
-            ? 'Processing...'
-            : recording
-            ? 'Stop Recording'
-            : 'Start Speaking'}
-        </span>
+        {processing ? (
+          <><Loader2 className="w-4 h-4 animate-spin" /><span>Processing...</span></>
+        ) : recording ? (
+          <><Square className="w-4 h-4" /><span>Stop Recording</span></>
+        ) : (
+          <><Mic className="w-4 h-4" /><span>🎙️ Voice Input</span></>
+        )}
       </button>
 
-      {/* Recording Status */}
       {recording && (
-        <div className="flex items-center justify-center gap-2 text-red-600 text-sm font-semibold">
-          <span className="inline-block w-3 h-3 bg-red-600 rounded-full animate-pulse"></span>
+        <div className="flex items-center justify-center gap-2 text-red-500 text-xs font-semibold">
+          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
           Recording... Speak now
         </div>
       )}

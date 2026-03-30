@@ -5,7 +5,8 @@ import {
   ClerkProvider
 } from "@clerk/nextjs"
 import Provider from "./provider"
-import { LanguageProvider } from "@/context/LanguageContext" // ✅ Import LanguageProvider
+import { LanguageProvider } from "@/context/LanguageContext"
+import AutoLogout from "@/components/AutoLogout"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "AI Medical Voice Agent",
-  description: "Speak to a doctor in your language.",
+  title: "HealthAI — AI Medical Voice Agent",
+  description: "Speak to an AI doctor in your language. Get instant medical consultations, symptom analysis, and personalized health recommendations 24/7.",
 }
 
 export default function RootLayout({
@@ -31,8 +32,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <LanguageProvider> {/* ✅ Add language context globally */}
+          <LanguageProvider>
             <Provider>
+              <AutoLogout />
               {children}
             </Provider>
           </LanguageProvider>

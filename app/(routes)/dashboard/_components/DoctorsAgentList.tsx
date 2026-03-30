@@ -7,16 +7,14 @@ import DoctorAgentCard from "./DoctorAgentCard";
 
 function DoctorsAgentList() {
   return (
-    <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {AIDoctorAgents.map((doctor, index) => (
-          <DoctorAgentCard
-            key={index}
-            doctorAgent={doctor}
-            onSelect={() => {}} // no-op function, required prop
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+      {AIDoctorAgents.map((doctor, index) => (
+        <DoctorAgentCard
+          key={index}
+          doctorAgent={doctor}
+          onSelect={() => {}}
+        />
+      ))}
     </div>
   );
 }

@@ -7,9 +7,9 @@ function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className='bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 min-h-screen'>
+    <div className='min-h-screen bg-soft-gradient'>
       <AppHeader />
-      <div className='px-10 md:px-20 lg:px-40 py-16'>
+      <div className='px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 pt-20 sm:pt-24 pb-12'>
         {children}
       </div>
     </div>

@@ -1,9 +1,9 @@
 // app/(routes)/dashboard/_components/DoctorAgentCard.tsx
 "use client";
 
-import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import React from "react";
+import { ArrowRight } from "lucide-react";
 
 export type doctorAgent = {
   id: number;
@@ -23,48 +23,51 @@ interface Props {
 
 const DoctorAgentCard: React.FC<Props> = ({ doctorAgent, onSelect, isSelected }) => {
   return (
-    <Card
+    <div
       onClick={onSelect}
-      className={`cursor-pointer hover:shadow-xl transition-all duration-300 p-6 rounded-2xl border-2 ${
+      className={`cursor-pointer transition-all duration-200 rounded-2xl border-2 group overflow-hidden ${
         isSelected 
-          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
-          : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
-      } bg-white dark:bg-gray-900 group`}
+          ? "border-blue-500 bg-blue-50/40 shadow-lg shadow-blue-100/40" 
+          : "border-gray-100 bg-white hover:border-blue-200 hover:shadow-lg hover:shadow-gray-100/50"
+      }`}
     >
-      <div className="flex flex-col items-center space-y-4">
-        {/* Doctor Image */}
-        <div className="w-24 h-24 relative ring-4 ring-offset-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-400 transition-all rounded-full overflow-hidden">
-          <Image
-            src={doctorAgent.image}
-            alt={doctorAgent.specialist}
-            fill
-            className="object-cover"
-          />
-        </div>
+      {/* Doctor Image - adjusted size */}
+      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        <Image
+          src={doctorAgent.image}
+          alt={doctorAgent.specialist}
+          fill
+          className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+        />
+        {doctorAgent.subscriptionRequired && (
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-white/90 backdrop-blur-sm rounded-md border border-amber-200">
+            <span className="text-[8px] sm:text-[9px] font-bold text-amber-700 uppercase tracking-wider">Pro</span>
+          </div>
+        )}
+      </div>
 
-        {/* Specialist Name */}
-        <h3 className="text-base font-bold text-center text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      {/* Content */}
+      <div className="p-3 sm:p-4">
+        <h3 className={`text-xs sm:text-sm font-bold mb-1 transition-colors leading-tight ${
+          isSelected ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-600'
+        }`}>
           {doctorAgent.specialist}
         </h3>
-
-        {/* Description */}
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center line-clamp-2">
+        <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed line-clamp-2 mb-3">
           {doctorAgent.description}
         </p>
 
-        {/* Badge */}
-        {doctorAgent.subscriptionRequired && (
-          <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-xs font-semibold rounded-full">
-            Premium
-          </span>
-        )}
-
-        {/* CTA */}
-        <button className="w-full mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-medium text-sm hover:from-blue-600 hover:to-cyan-600 transition-all transform group-hover:scale-105">
-          Consult Now →
+        <button className={`w-full py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-all duration-200 ${
+          isSelected
+            ? 'bg-blue-600 text-white shadow-md shadow-blue-200/50'
+            : 'bg-gray-50 text-gray-600 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-blue-200/50'
+        }`}>
+          Consult Now
+          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         </button>
       </div>
-    </Card>
+    </div>
   );
 };
 
